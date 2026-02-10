@@ -1,17 +1,13 @@
--- Show and add bonus correction
-SELECT * FROM projects;
-SELECT * FROM corrections;
+-- SQL script that creates a stored procedure AddBonus that adds a new correction for a student.
 
-SELECT "--";
+DELIMITER $$
 
-CALL AddBonus((SELECT id FROM users WHERE name = "Jeanne"), "Python is cool", 100);
+CREATE PROCEDURE AddBonus(IN user_id INTEGER, IN project_name VARCHAR(255), IN score INTEGER)
+BEGIN
+    INSERT INTO projects(name) SELECT project_name FROM DUAL
+    WHERE NOT EXISTS (SELECT * FROM projects WHERE name = project_name LIMIT 1);
 
-CALL AddBonus((SELECT id FROM users WHERE name = "Jeanne"), "Bonus project", 100);
-CALL AddBonus((SELECT id FROM users WHERE name = "Bob"), "Bonus project", 10);
+    INSERT INTO corrections (user_id, project_id, score) VALUES(user_id, (SELECT id FROM projects WHERE name = project_name), score);
+END $$
 
-CALL AddBonus((SELECT id FROM users WHERE name = "Jeanne"), "New bonus", 90);
-
-SELECT "--";
-
-SELECT * FROM projects;
-SELECT * FROM corrections;
+DELIMITER ;
